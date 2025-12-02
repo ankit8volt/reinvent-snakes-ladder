@@ -8,6 +8,69 @@ const gameState = {
     isAnimating: false
 };
 
+// Sound Effects System
+const SoundEffects = {
+    audioContext: null,
+    
+    // Initialize audio context
+    init() {
+        try {
+            this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        } catch (error) {
+            console.warn('Web Audio API not supported:', error);
+        }
+    },
+    
+    // Play dice roll sound
+    playDiceRoll() {
+        if (!this.audioContext) return;
+        
+        const now = this.audioContext.currentTime;
+        
+        // Create multiple short bursts to simulate dice rattling
+        for (let i = 0; i < 8; i++) {
+            const oscillator = this.audioContext.createOscillator();
+            const gainNode = this.audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(this.audioContext.destination);
+            
+            // Random frequency for rattling effect
+            oscillator.frequency.value = 100 + Math.random() * 200;
+            oscillator.type = 'square';
+            
+            // Short burst
+            const startTime = now + (i * 0.08);
+            const endTime = startTime + 0.05;
+            
+            gainNode.gain.setValueAtTime(0.1, startTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, endTime);
+            
+            oscillator.start(startTime);
+            oscillator.stop(endTime);
+        }
+        
+        // Final "thud" when dice lands
+        setTimeout(() => {
+            const oscillator = this.audioContext.createOscillator();
+            const gainNode = this.audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(this.audioContext.destination);
+            
+            oscillator.frequency.value = 80;
+            oscillator.type = 'sine';
+            
+            const startTime = this.audioContext.currentTime;
+            gainNode.gain.setValueAtTime(0.2, startTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, startTime + 0.2);
+            
+            oscillator.start(startTime);
+            oscillator.stop(startTime + 0.2);
+        }, 600);
+    }
+};
+
 // Score Manager - handles score tracking and localStorage persistence
 const ScoreManager = {
     storageKeys: {
@@ -450,6 +513,9 @@ const AnimationController = {
         const dice3D = document.getElementById('dice3D');
         const diceDisplay = document.getElementById('diceResult');
         
+        // Play dice roll sound
+        SoundEffects.playDiceRoll();
+        
         // Remove any existing face classes
         dice3D.className = 'dice-3d';
         
@@ -530,6 +596,9 @@ function init() {
     
     // Initialize Score Manager
     ScoreManager.init();
+    
+    // Initialize Sound Effects
+    SoundEffects.init();
     
     // Adjust canvas size on load and resize
     adjustCanvasSize();

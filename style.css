@@ -1,0 +1,463 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #0a0a0a;
+    color: #ffffff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+    overflow: hidden;
+}
+
+.container {
+    text-align: center;
+    max-width: 1400px;
+    width: 100%;
+    max-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+h1 {
+    color: #790ECB;
+    margin-bottom: 20px;
+    font-size: 2em;
+    text-shadow: 0 0 20px rgba(121, 14, 203, 0.5);
+}
+
+.screen {
+    background-color: #1a1a1a;
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 8px 32px rgba(121, 14, 203, 0.2);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* Horizontal Game Layout */
+.game-layout {
+    display: flex;
+    flex-direction: row;
+    gap: 30px;
+    align-items: flex-start;
+    justify-content: center;
+    height: 100%;
+    max-height: calc(100vh - 140px);
+}
+
+.board-section {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.controls-section {
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    min-width: 300px;
+    max-width: 400px;
+}
+
+.hidden {
+    display: none;
+}
+
+#startScreen h2 {
+    color: #ffffff;
+    margin-bottom: 20px;
+}
+
+#startScreen label {
+    display: block;
+    margin: 20px 0 10px;
+    color: #b0b0b0;
+}
+
+#startScreen input {
+    padding: 10px;
+    font-size: 1.2em;
+    border: 2px solid #790ECB;
+    background-color: #2a2a2a;
+    color: #ffffff;
+    border-radius: 8px;
+    width: 100px;
+    text-align: center;
+}
+
+.btn-primary {
+    background-color: #790ECB;
+    color: #ffffff;
+    border: none;
+    padding: 15px 40px;
+    font-size: 1.2em;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: 20px;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    background-color: #9a3de8;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(121, 14, 203, 0.4);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+}
+
+.btn-primary:disabled {
+    background-color: #4a4a4a;
+    cursor: not-allowed;
+    transform: none;
+}
+
+#gameCanvas {
+    border: 3px solid #790ECB;
+    border-radius: 10px;
+    background-color: #2a2a2a;
+    box-shadow: 0 0 30px rgba(121, 14, 203, 0.3);
+    width: 600px;
+    height: 600px;
+    max-width: 100%;
+    max-height: calc(100vh - 160px);
+}
+
+.game-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    align-items: center;
+}
+
+.current-player {
+    font-size: 1.3em;
+    margin-bottom: 15px;
+    color: #ffffff;
+    font-weight: bold;
+}
+
+.dice-result {
+    font-size: 2em;
+    margin-top: 15px;
+    color: #790ECB;
+    min-height: 40px;
+}
+
+.scoreboard {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 100%;
+}
+
+.player-score {
+    background-color: #2a2a2a;
+    padding: 15px 20px;
+    border-radius: 10px;
+    border: 2px solid #790ECB;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.player-score.active {
+    border-color: #9a3de8;
+    box-shadow: 0 0 20px rgba(121, 14, 203, 0.5);
+}
+
+.player-score.at-high-score {
+    background: linear-gradient(135deg, #2a2a2a 0%, #3a1a4a 100%);
+    box-shadow: 0 0 25px rgba(121, 14, 203, 0.6);
+}
+
+.player-icon {
+    font-size: 2.5em;
+    flex-shrink: 0;
+}
+
+.player-info {
+    flex: 1;
+    text-align: left;
+}
+
+.player-position {
+    color: #ffffff;
+    font-size: 1em;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+#gameOverScreen h2 {
+    color: #790ECB;
+    margin-bottom: 20px;
+}
+
+#winner {
+    font-size: 1.5em;
+    margin: 20px 0;
+    color: #ffffff;
+}
+
+/* Dice Alert Overlay */
+.dice-alert {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(121, 14, 203, 0.95);
+    padding: 40px 60px;
+    border-radius: 20px;
+    box-shadow: 0 10px 50px rgba(121, 14, 203, 0.6);
+    z-index: 1000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.dice-alert.show {
+    opacity: 1;
+    animation: pulse 0.5s ease;
+}
+
+.dice-alert-text {
+    font-size: 2.5em;
+    font-weight: bold;
+    color: #ffffff;
+    text-align: center;
+}
+
+@keyframes pulse {
+    0% {
+        transform: translate(-50%, -50%) scale(0.8);
+    }
+    50% {
+        transform: translate(-50%, -50%) scale(1.1);
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(1);
+    }
+}
+
+.player-high-score {
+    color: #666;
+    font-size: 0.85em;
+    margin-top: 5px;
+}
+
+/* Confetti Canvas Overlay */
+.confetti-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 999;
+}
+
+/* Effect Emojis */
+.effect-emoji {
+    position: fixed;
+    font-size: 3.5em;
+    pointer-events: none;
+    z-index: 998;
+    animation-duration: 1.5s;
+    animation-fill-mode: forwards;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+}
+
+.happy-effect {
+    animation-name: floatUp;
+}
+
+.sad-effect {
+    animation-name: floatDown;
+}
+
+@keyframes floatUp {
+    0% {
+        transform: translate(-50%, -50%) scale(0);
+        opacity: 1;
+    }
+    50% {
+        transform: translate(-50%, -100px) scale(1.2);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(-50%, -150px) scale(0.8);
+        opacity: 0;
+    }
+}
+
+@keyframes floatDown {
+    0% {
+        transform: translate(-50%, -50%) scale(0);
+        opacity: 1;
+    }
+    50% {
+        transform: translate(-50%, 50px) scale(1.2);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(-50%, 100px) scale(0.8);
+        opacity: 0;
+    }
+}
+
+/* 3D Dice Styles */
+.dice-container {
+    perspective: 1000px;
+    margin: 20px auto;
+    width: 100px;
+    height: 100px;
+}
+
+.dice-3d {
+    width: 100px;
+    height: 100px;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.1s ease;
+}
+
+.dice-3d.rolling {
+    animation: diceRoll 1.5s ease-out;
+}
+
+.dice-face {
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    background: linear-gradient(135deg, #790ECB 0%, #9a3de8 100%);
+    border: 3px solid #ffffff;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 4em;
+    color: #ffffff;
+    box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.3);
+    backface-visibility: hidden;
+}
+
+.dice-face-1 {
+    transform: rotateY(0deg) translateZ(50px);
+}
+
+.dice-face-2 {
+    transform: rotateY(90deg) translateZ(50px);
+}
+
+.dice-face-3 {
+    transform: rotateY(180deg) translateZ(50px);
+}
+
+.dice-face-4 {
+    transform: rotateY(-90deg) translateZ(50px);
+}
+
+.dice-face-5 {
+    transform: rotateX(90deg) translateZ(50px);
+}
+
+.dice-face-6 {
+    transform: rotateX(-90deg) translateZ(50px);
+}
+
+@keyframes diceRoll {
+    0% {
+        transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg);
+    }
+    25% {
+        transform: rotateX(360deg) rotateY(180deg) rotateZ(90deg);
+    }
+    50% {
+        transform: rotateX(720deg) rotateY(360deg) rotateZ(180deg);
+    }
+    75% {
+        transform: rotateX(1080deg) rotateY(540deg) rotateZ(270deg);
+    }
+    100% {
+        transform: rotateX(1440deg) rotateY(720deg) rotateZ(360deg);
+    }
+}
+
+/* Dice final positions for each face */
+.dice-3d.show-1 {
+    transform: rotateX(0deg) rotateY(0deg);
+}
+
+.dice-3d.show-2 {
+    transform: rotateX(0deg) rotateY(-90deg);
+}
+
+.dice-3d.show-3 {
+    transform: rotateX(0deg) rotateY(-180deg);
+}
+
+.dice-3d.show-4 {
+    transform: rotateX(0deg) rotateY(90deg);
+}
+
+.dice-3d.show-5 {
+    transform: rotateX(-90deg) rotateY(0deg);
+}
+
+.dice-3d.show-6 {
+    transform: rotateX(90deg) rotateY(0deg);
+}
+
+/* Responsive adjustments */
+@media (max-width: 1200px) {
+    .game-layout {
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+    }
+    
+    .controls-section {
+        max-width: 600px;
+        width: 100%;
+    }
+    
+    .scoreboard {
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    
+    .player-score {
+        flex: 0 0 calc(50% - 10px);
+        min-width: 200px;
+    }
+}
+
+@media (max-width: 768px) {
+    h1 {
+        font-size: 1.5em;
+        margin-bottom: 15px;
+    }
+    
+    #gameCanvas {
+        width: 100%;
+        height: auto;
+    }
+    
+    .player-score {
+        flex: 0 0 100%;
+    }
+}

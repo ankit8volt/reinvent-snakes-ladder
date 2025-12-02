@@ -68,6 +68,86 @@ const SoundEffects = {
             oscillator.start(startTime);
             oscillator.stop(startTime + 0.2);
         }, 600);
+    },
+    
+    // Play firecracker sound for ladder celebration
+    playFirecracker() {
+        if (!this.audioContext) return;
+        
+        const now = this.audioContext.currentTime;
+        
+        // Multiple ascending pops for firecracker effect
+        for (let i = 0; i < 12; i++) {
+            const oscillator = this.audioContext.createOscillator();
+            const gainNode = this.audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(this.audioContext.destination);
+            
+            // Ascending frequencies for celebration
+            oscillator.frequency.value = 400 + (i * 100) + Math.random() * 50;
+            oscillator.type = 'sawtooth';
+            
+            const startTime = now + (i * 0.05);
+            const endTime = startTime + 0.03;
+            
+            gainNode.gain.setValueAtTime(0.15, startTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, endTime);
+            
+            oscillator.start(startTime);
+            oscillator.stop(endTime);
+        }
+        
+        // Add sparkle sounds
+        for (let i = 0; i < 6; i++) {
+            setTimeout(() => {
+                const oscillator = this.audioContext.createOscillator();
+                const gainNode = this.audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(this.audioContext.destination);
+                
+                oscillator.frequency.value = 1000 + Math.random() * 1000;
+                oscillator.type = 'sine';
+                
+                const startTime = this.audioContext.currentTime;
+                gainNode.gain.setValueAtTime(0.08, startTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, startTime + 0.1);
+                
+                oscillator.start(startTime);
+                oscillator.stop(startTime + 0.1);
+            }, i * 80);
+        }
+    },
+    
+    // Play buzzer sound for snake bite
+    playBuzzer() {
+        if (!this.audioContext) return;
+        
+        const now = this.audioContext.currentTime;
+        
+        // Low descending buzz for negative feedback
+        for (let i = 0; i < 3; i++) {
+            const oscillator = this.audioContext.createOscillator();
+            const gainNode = this.audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(this.audioContext.destination);
+            
+            // Descending frequencies for negative effect
+            oscillator.frequency.value = 200 - (i * 40);
+            oscillator.type = 'sawtooth';
+            
+            const startTime = now + (i * 0.15);
+            const endTime = startTime + 0.15;
+            
+            gainNode.gain.setValueAtTime(0.2, startTime);
+            gainNode.gain.linearRampToValueAtTime(0.2, endTime - 0.02);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, endTime);
+            
+            oscillator.start(startTime);
+            oscillator.stop(endTime);
+        }
     }
 };
 
@@ -568,8 +648,28 @@ const AnimationController = {
     }
 };
 
-// Player emojis
-const playerEmojis = ['🔴', '🔵', '🟢', '🟡', '🟠', '🟣'];
+// Player colors for Kiro logo
+const playerColors = ['#FF4444', '#4444FF', '#44FF44', '#FFFF44', '#FF8844', '#790ECB'];
+
+// Function to draw Kiro logo
+function drawKiroLogo(ctx, x, y, size, color) {
+    ctx.save();
+    ctx.translate(x, y);
+    
+    // Draw K letter in Kiro style
+    ctx.fillStyle = color;
+    ctx.font = `bold ${size}px Arial`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('K', 0, 0);
+    
+    // Add glow effect
+    ctx.shadowColor = color;
+    ctx.shadowBlur = 10;
+    ctx.fillText('K', 0, 0);
+    
+    ctx.restore();
+}
 
 // Canvas setup
 const canvas = document.getElementById('gameCanvas');
@@ -623,7 +723,7 @@ function startGame() {
     for (let i = 0; i < playerCount; i++) {
         gameState.players.push({
             id: i,
-            emoji: playerEmojis[i],
+            color: playerColors[i],
             position: 0, // Starting outside the board
             displayPosition: 0,
             currentScore: 0,
@@ -770,10 +870,8 @@ function drawPlayer(player) {
     const playerIndex = playersOnSameCell.indexOf(player);
     const offsetX = (playerIndex - playersOnSameCell.length / 2) * 20;
     
-    ctx.font = '32px Arial';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(player.emoji, coords.x + offsetX, coords.y);
+    // Draw Kiro logo instead of emoji
+    drawKiroLogo(ctx, coords.x + offsetX, coords.y, 32, player.color);
 }
 
 function rollDice() {
@@ -844,6 +942,8 @@ function movePlayer(player, steps) {
         if (snake) {
             // Show sad effect for landing on snake
             EffectSystem.showSadEffect(newPosition);
+            // Play buzzer sound
+            SoundEffects.playBuzzer();
             
             setTimeout(() => {
                 // Direct animation for snake (no intermediate positions)
@@ -867,6 +967,8 @@ function movePlayer(player, steps) {
         } else if (ladder) {
             // Show happy effect for landing on ladder
             EffectSystem.showHappyEffect(newPosition);
+            // Play firecracker sound
+            SoundEffects.playFirecracker();
             
             setTimeout(() => {
                 // Direct animation for ladder (no intermediate positions)
@@ -945,8 +1047,8 @@ function nextPlayer() {
 
 function updateCurrentPlayer() {
     const currentPlayer = gameState.players[gameState.currentPlayerIndex];
-    document.getElementById('currentPlayer').textContent = 
-        `Current Player: ${currentPlayer.emoji}`;
+    const playerDisplay = document.getElementById('currentPlayer');
+    playerDisplay.innerHTML = `Current Player: <span style="color: ${currentPlayer.color}; font-weight: bold;">Player ${currentPlayer.id + 1}</span>`;
 }
 
 function updateScoreboard() {
@@ -967,9 +1069,9 @@ function updateScoreboard() {
         }
         
         scoreDiv.innerHTML = `
-            <div class="player-icon">${player.emoji}</div>
+            <div class="player-icon" style="color: ${player.color}; font-weight: bold; font-size: 2em;">K</div>
             <div class="player-info">
-                <div class="player-position">Position: ${player.position}</div>
+                <div class="player-position">Player ${player.id + 1} - Position: ${player.position}</div>
                 <div class="player-high-score" style="color: ${atHighScore ? '#790ECB' : '#888'}">
                     High Score: ${player.highScore}
                 </div>
@@ -981,8 +1083,8 @@ function updateScoreboard() {
 }
 
 function showGameOver(winner) {
-    document.getElementById('winner').textContent = 
-        `${winner.emoji} Player ${winner.id + 1} Wins!`;
+    document.getElementById('winner').innerHTML = 
+        `<span style="color: ${winner.color}; font-weight: bold;">Player ${winner.id + 1}</span> Wins! 🎉`;
     
     setTimeout(() => {
         document.getElementById('gameScreen').classList.add('hidden');

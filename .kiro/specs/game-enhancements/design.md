@@ -16,6 +16,9 @@ The enhanced system follows the existing single-page application architecture wi
 2. **Animation Controller**: Manages dice roll animations and timing
 3. **Effect System**: Renders visual effects (confetti, happy/sad animations)
 4. **Alert Display**: Shows centered notifications for dice results
+5. **Sound Effects System**: Generates procedural audio feedback using Web Audio API
+6. **Visual Renderer**: Draws styled snakes and ladders with enhanced graphics
+7. **Kiro Logo Renderer**: Renders colored Kiro logos for player representation
 
 ### Integration Points
 
@@ -114,6 +117,34 @@ const EffectSystem = {
   // Clear all effects
   clearEffects()
 }
+```
+
+### Sound Effects System
+
+```javascript
+const SoundEffects = {
+  // Initialize Web Audio API context
+  init()
+  
+  // Play dice rolling sound with rattling effect
+  playDiceRoll()
+  
+  // Play celebratory firecracker sound for ladders
+  playFirecracker()
+  
+  // Play negative buzzer sound for snakes
+  playBuzzer()
+}
+```
+
+### Kiro Logo Renderer
+
+```javascript
+// Create colored Kiro logo SVG
+function createColoredKiroIcon(color)
+
+// Draw Kiro logo on canvas with glow effect
+function drawKiroLogo(ctx, x, y, size, color)
 ```
 
 ## Data Models
@@ -277,6 +308,46 @@ const EffectSystem = {
 *For any* pair of snakes and ladders that overlap, both should remain visually distinguishable.
 **Validates: Requirements 8.5**
 
+### Sound Effects Properties
+
+**Property 24: Dice roll sound trigger**
+*For any* dice roll action, when the roll dice button is clicked, a dice rolling sound effect should be played.
+**Validates: Requirements 9.1**
+
+**Property 25: Ladder sound trigger**
+*For any* ladder landing, when a player lands on a ladder bottom, a firecracker sound effect should be played.
+**Validates: Requirements 9.2**
+
+**Property 26: Snake sound trigger**
+*For any* snake landing, when a player lands on a snake head, a buzzer sound effect should be played.
+**Validates: Requirements 9.3**
+
+**Property 27: Graceful audio degradation**
+*For any* game session where Web Audio API is unavailable, the game should continue functioning without sound effects.
+**Validates: Requirements 9.4**
+
+### Kiro Logo Properties
+
+**Property 28: Kiro logo player representation**
+*For any* player on the board, they should be rendered as a colored Kiro logo rather than an emoji.
+**Validates: Requirements 10.1**
+
+**Property 29: Distinct player colors**
+*For any* set of players in a game, each player should have a unique color from the set (red, blue, green, yellow, orange, purple).
+**Validates: Requirements 10.2**
+
+**Property 30: Player offset on same cell**
+*For any* set of players occupying the same cell, their logos should be horizontally offset to prevent visual overlap.
+**Validates: Requirements 10.3**
+
+**Property 31: Scoreboard logo display**
+*For any* player in the scoreboard, their colored Kiro logo should be displayed next to their score information.
+**Validates: Requirements 10.4**
+
+**Property 32: Logo glow effect**
+*For any* rendered Kiro logo, it should have a glow effect matching the player's color.
+**Validates: Requirements 10.5**
+
 ## Implementation Details
 
 ### Dice 3D Rotation
@@ -337,6 +408,39 @@ Ladders will be drawn with:
 3. Add evenly-spaced rungs perpendicular to rails
 4. Use brown/black colors for wood appearance
 5. Add slight shadows for depth
+
+### Sound Effects Implementation
+
+Sound effects are generated procedurally using the Web Audio API:
+
+**Dice Roll Sound:**
+- Multiple short oscillator bursts (8 bursts) to simulate rattling
+- Random frequencies between 100-300 Hz with square wave
+- Final "thud" sound at 80 Hz with sine wave after 600ms
+- Each burst lasts 50ms with exponential gain decay
+
+**Firecracker Sound (Ladder):**
+- 12 ascending pops with frequencies from 400-1600 Hz
+- Sawtooth wave for sharp, celebratory effect
+- Additional 6 sparkle sounds at 1000-2000 Hz with sine wave
+- Staggered timing for realistic firecracker sequence
+
+**Buzzer Sound (Snake):**
+- 3 descending tones from 200 Hz to 120 Hz
+- Sawtooth wave for harsh, negative feedback
+- Each tone lasts 150ms with linear then exponential decay
+- Creates a "wah-wah-wah" descending effect
+
+### Kiro Logo Implementation
+
+Player representation uses dynamically generated SVG Kiro logos:
+
+1. **SVG Generation**: Create inline SVG with player-specific color
+2. **Caching**: Cache generated logos by color to avoid regeneration
+3. **Canvas Rendering**: Convert SVG to Image and draw on canvas
+4. **Glow Effect**: Use canvas shadowBlur and shadowColor for glow
+5. **Offset Calculation**: When multiple players share a cell, calculate horizontal offset based on player index
+6. **Scoreboard Integration**: Use base64-encoded SVG data URLs for scoreboard images
 
 ## Error Handling
 

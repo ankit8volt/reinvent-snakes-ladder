@@ -192,3 +192,66 @@
   - Verify layout fits in single viewport without scrolling
   - Verify styled snakes and ladders render correctly
   - Test all features together with complete game flow
+
+- [x] 16. Implement Sound Effects System
+  - Create SoundEffects object with Web Audio API initialization
+  - Implement playDiceRoll function with rattling and thud sounds
+  - Implement playFirecracker function with ascending pops and sparkles for ladder celebration
+  - Implement playBuzzer function with descending tones for snake penalty
+  - Add graceful degradation when Web Audio API is unavailable
+  - Integrate sound effects into rollDice, ladder landing, and snake landing events
+  - _Requirements: 9.1, 9.2, 9.3, 9.4, 9.5_
+
+- [ ]* 16.1 Write property test for dice roll sound trigger
+  - **Property 24: Dice roll sound trigger**
+  - **Validates: Requirements 9.1**
+
+- [ ]* 16.2 Write property test for ladder sound trigger
+  - **Property 25: Ladder sound trigger**
+  - **Validates: Requirements 9.2**
+
+- [ ]* 16.3 Write property test for snake sound trigger
+  - **Property 26: Snake sound trigger**
+  - **Validates: Requirements 9.3**
+
+- [ ]* 16.4 Write property test for graceful audio degradation
+  - **Property 27: Graceful audio degradation**
+  - **Validates: Requirements 9.4**
+
+- [x] 17. Implement Kiro Logo Player Representation
+  - Create createColoredKiroIcon function to generate SVG Kiro logos with player colors
+  - Implement drawKiroLogo function to render logos on canvas with glow effects
+  - Update drawPlayer function to use Kiro logos instead of emojis
+  - Add logo caching system to avoid regenerating SVGs
+  - Implement player offset calculation for multiple players on same cell
+  - Update scoreboard to display colored Kiro logos using base64-encoded SVG data URLs
+  - Define player colors array: red, blue, green, yellow, orange, purple
+  - _Requirements: 10.1, 10.2, 10.3, 10.4, 10.5_
+
+- [ ]* 17.1 Write property test for Kiro logo player representation
+  - **Property 28: Kiro logo player representation**
+  - **Validates: Requirements 10.1**
+
+- [ ]* 17.2 Write property test for distinct player colors
+  - **Property 29: Distinct player colors**
+  - **Validates: Requirements 10.2**
+
+- [ ]* 17.3 Write property test for player offset on same cell
+  - **Property 30: Player offset on same cell**
+  - **Validates: Requirements 10.3**
+
+- [ ]* 17.4 Write property test for scoreboard logo display
+  - **Property 31: Scoreboard logo display**
+  - **Validates: Requirements 10.4**
+
+- [ ]* 17.5 Write property test for logo glow effect
+  - **Property 32: Logo glow effect**
+  - **Validates: Requirements 10.5**
+
+- [x] 18. Final integration and polish
+  - Test all sound effects with gameplay
+  - Verify Kiro logos render correctly on board and scoreboard
+  - Ensure sound effects sync properly with visual effects
+  - Test complete game flow with all enhancements
+  - Verify graceful degradation when audio is unavailable
+  - Polish timing and visual/audio coordination
